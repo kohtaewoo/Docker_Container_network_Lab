@@ -1,4 +1,4 @@
-# Docker_Container_network-_Lab
+# Docker_Container_Network_Lab
 # 컨테이너 간 네트워크 통신으로 Spring Boot ↔ MySQL 연동하기
 
 ## 1) 목표
@@ -14,16 +14,14 @@
 ## 2) 배경 지식
 
 ```
-[Container eth0: 172.17.x.x] ─> [docker0(172.17.0.1)] ─> 
-NAT(iptables) ─> [호스트 NIC(enp0s3)] ─> 외부
-
+[Container eth0: 172.17.x.x] ─> [docker0(172.17.0.1)] ─> NAT(iptables) ─> [호스트 NIC(enp0s3)] ─> 외부
 ```
 
 - **docker0(브리지)**: 컨테이너를 스위치처럼 연결, 기본 대역 172.17.0.0/16
 - **컨테이너 IP**: 172.17.x.x 사용자 브리지 대역(예: 172.19.0.0/16)
 - **컨테이너 이름으로 DNS**: `mysql://mysqldb:3306` 식으로 이름으로 접근
 
-네트워크 드라이버 핵심만:
+네트워크 드라이버:
 
 - `bridge`(기본): 컨테이너↔컨테이너, 컨테이너↔호스트 통신 OK
 - `host`: 호스트 네트워크를 그대로 사용(성능↑/격리↓, 포트매핑 불필요)
@@ -44,7 +42,6 @@ Host:8081 ─┼─▶│:8081         │  JDBC  │:3306         │  │
  (PortFWD) │  │URL→ jdbc:mysql://mysqldb:3306/fisa   │  │
            │  └──────────────┘        └──────────────┘  │
            └────────────────────────────────────────────┘
-
 ```
 
 ## 4) 단계별 실습
@@ -57,7 +54,6 @@ docker network create springboot-mysql-net
 
 # 상세 확인 (서브넷/GW, 컨테이너 연결 상태 등)
 docker inspect springboot-mysql-net
-
 ```
 
 ### B. MySQL 컨테이너 실행 & 초기화
@@ -70,7 +66,6 @@ docker run --name mysqldb \
   -e MYSQL_ROOT_PASSWORD=root \
   -e MYSQL_DATABASE=fisa \
   -d mysql:8.0
-
 ```
 
 ```bash
@@ -78,7 +73,6 @@ docker run --name mysqldb \
 docker exec -it -e LC_ALL=C.UTF-8 mysqldb bash
 
 mysql -u root -p
-
 ```
 
 필수 스키마(예시):
@@ -106,7 +100,6 @@ INSERT INTO dept VALUES (10,'ACCOUNTING','NEW YORK'),
 COMMIT;
 
 SELECT * FROM dept;
-
 ```
 
 ### C. Spring Boot 컨테이너 이미지 빌드
@@ -234,7 +227,6 @@ services:
 networks:
   appnet:
     driver: bridge
-
 ```
 
 ```bash
